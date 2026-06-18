@@ -14,6 +14,8 @@ public class Game1 : Game
   private Texture2D _bg;
   private Texture2D _ground;
 
+  private Bird _bird;
+
   // scroll
   private float _bgScroll = 0;
   private float _groundScroll = 0;
@@ -50,7 +52,8 @@ public class Game1 : Game
     _renderer = new RenderTarget2D(GraphicsDevice, VW, VH);
     _bg = Content.Load<Texture2D>("Images/bg_ds");
     _ground = Content.Load<Texture2D>("Images/ground_ds");
-
+    _bird = new Bird(Content);
+    _bird.Position = new Vector2(VW / 2 - _bird.Width / 2, VH / 2 - _bird.Height / 2);
   }
 
   protected override void Update(GameTime gameTime)
@@ -67,6 +70,8 @@ public class Game1 : Game
     if (_groundScroll >= _ground.Width)
       _groundScroll -= _ground.Width;
 
+    _bird.Update(dt);
+
 
     base.Update(gameTime);
   }
@@ -81,6 +86,7 @@ public class Game1 : Game
     _spriteBatch.Draw(_bg, new Vector2((int)MathF.Floor(-_bgScroll + _bg.Width), 0), Color.White);
     _spriteBatch.Draw(_ground, new Vector2((int)MathF.Floor(-_groundScroll), VH - _ground.Height), Color.White);
     _spriteBatch.Draw(_ground, new Vector2((int)MathF.Floor(-_groundScroll + _ground.Width), VH - _ground.Height), Color.White);
+    _bird.Draw(_spriteBatch);
     _spriteBatch.End();
 
     GraphicsDevice.SetRenderTarget(null);
