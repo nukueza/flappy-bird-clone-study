@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using System;
 
 namespace flap_dark_souls;
@@ -15,6 +16,12 @@ public class Game1 : Game
   private Texture2D _ground;
 
   private Bird _bird;
+
+  private List<BatuBata> _batuBata = new List<BatuBata>();
+  private float _batuBataSpawnTimer = 0;
+  private const float BATU_SPAWN_INTERVAL = 2.5f;
+  private const float BATU_SPEED = 60f;
+  private Random _rand = new();
 
   // scroll
   private float _bgScroll = 0;
@@ -70,6 +77,25 @@ public class Game1 : Game
     if (_groundScroll >= _ground.Width)
       _groundScroll -= _ground.Width;
 
+    _batuBataSpawnTimer += dt;
+    if (_batuBataSpawnTimer >= BATU_SPAWN_INTERVAL)
+    {
+      _batuBataSpawnTimer = 0f;
+      int minGapY = 40;
+      int maxGapY = VH - 60;
+      float randomGapY = _rand.Next(minGapY, maxGapY);
+      _batuBata.Add(new BatuBata(Content, VW, randomGapY));
+    }
+
+    for (int i = _batuBata.Count - 1; i >= 0; i--)
+    {
+      _batuBata[i].Update(BATU_SPEED, dt);
+      if (_batuBata[i].Position.X + _batuBata[i].Width < 0 )
+      {
+        _batuBata.RemoveAt(i);
+      }
+    }
+
     _bird.Update(dt);
 
 
@@ -87,6 +113,10 @@ public class Game1 : Game
     _spriteBatch.Draw(_ground, new Vector2((int)MathF.Floor(-_groundScroll), VH - _ground.Height), Color.White);
     _spriteBatch.Draw(_ground, new Vector2((int)MathF.Floor(-_groundScroll + _ground.Width), VH - _ground.Height), Color.White);
     _bird.Draw(_spriteBatch);
+    foreach (var batuBata in _batuBata)
+    {
+      batuBata.Draw(_spriteBatch);
+    }
     _spriteBatch.End();
 
     GraphicsDevice.SetRenderTarget(null);
