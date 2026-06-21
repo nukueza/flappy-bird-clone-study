@@ -13,6 +13,20 @@ public class BatuBata
   private float _topPipeY;
   private float _bottomPipeY;
 
+  public Rectangle TopPipe => new Rectangle(
+      (int)Position.X,
+      (int)_topPipeY,
+      Width,
+      Height
+      );
+
+  public Rectangle BottomPipe => new Rectangle(
+      (int)Position.X,
+      (int)_bottomPipeY,
+      Width,
+      Height
+      );
+
   public BatuBata(ContentManager content, float startX, float gapCenterY)
   {
     _texture = content.Load<Texture2D>("Images/pipe_ds");

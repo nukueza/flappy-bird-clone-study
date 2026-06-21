@@ -36,6 +36,9 @@ public class Game1 : Game
   private const int CW = 1280;
   private const int CH = 720;
 
+  // game state
+  private GameState _state = GameState.Start;
+
   public Game1()
   {
     _graphics = new GraphicsDeviceManager(this);
@@ -69,6 +72,34 @@ public class Game1 : Game
       Exit();
 
     float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+    switch (_state)
+    {
+      case GameState.Start:
+        if (Keyboard.GetState().IsKeyDown(Keys.Enter))
+        {
+          _state = GameState.Play;
+        }
+        break;
+      case GameState.Play:
+        Playing(dt);
+        break;
+      case GameState.GameOver:
+        if (Keyboard.GetState().IsKeyDown(Keys.Enter))
+        {
+          Reset();
+          _state = GameState.Play;
+        }
+        break;
+    }
+
+
+    base.Update(gameTime);
+  }
+
+  private void Playing(float dt)
+  {
+
     _bgScroll += BG_SPEED * dt;
     if (_bgScroll >= _bg.Width)
       _bgScroll -= _bg.Width;
@@ -98,8 +129,45 @@ public class Game1 : Game
 
     _bird.Update(dt);
 
+    if (CheckCollision())
+    {
+      _bird.Color = Color.Red;
+      _state = GameState.GameOver;
+    }
+    else
+    {
+      _bird.Color = Color.White;
+    }
+  }
 
-    base.Update(gameTime);
+  private void Reset()
+  {
+    _bird.Reset();
+    _batuBata.Clear();
+    _groundScroll = 0;
+    _bgScroll = 0;
+    _batuBataSpawnTimer = 0;
+  }
+
+  private bool CheckCollision()
+  {
+    var groundBound = new Rectangle(
+        0,
+        VH - _ground.Height,
+        _ground.Width,
+        _ground.Height
+        );
+
+    if (_bird.Bounds.Intersects(groundBound)) return true;
+
+    foreach (var batubata in _batuBata)
+    {
+      if (_bird.Bounds.Intersects(batubata.BottomPipe) || _bird.Bounds.Intersects(batubata.TopPipe))
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   protected override void Draw(GameTime gameTime)
@@ -129,3 +197,11 @@ public class Game1 : Game
     base.Draw(gameTime);
   }
 }
+
+public enum GameState
+{
+  Start,
+  Play,
+  GameOver
+}
+

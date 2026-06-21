@@ -15,6 +15,15 @@ public class Bird
   private const float JUMP_UP = -250;
   private KeyboardState _passKey;
 
+  public Color Color { get; set; } = Color.White;
+
+  public Rectangle Bounds => new Rectangle(
+      (int)Position.X,
+      (int)Position.Y,
+      Width,
+      Height
+      );
+
   public Bird(ContentManager content)
   {
     _texture = content.Load<Texture2D>("Images/bird_ds");
@@ -38,9 +47,16 @@ public class Bird
     _passKey = currentKey;
   }
 
+  public void Reset()
+  {
+    var pos = new Vector2(320 / 2 - _texture.Width / 2, 180 / 2 - _texture.Height / 2);
+    Position = pos;
+    Velocity = Vector2.Zero;
+  }
+
   public void Draw(SpriteBatch spriteBatch)
   {
     var pos = new Vector2((int)MathF.Floor(Position.X), (int)MathF.Floor(Position.Y));
-    spriteBatch.Draw(_texture, pos, Color.White);
+    spriteBatch.Draw(_texture, pos, Color);
   }
 }
